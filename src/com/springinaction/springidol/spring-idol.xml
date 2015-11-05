@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 注入beanBags -->
+    <bean id="duke" class="com.springinaction.springidol.Juggler">
+        <constructor-arg value="15"/>
+    </bean>
+
+    <!-- 创建Poem -->
+    <bean id="sonnet29" class="com.springinaction.springidol.Sonnet29"/>
+
+    <!-- 注入Poem -->
+    <bean id="poeticDuke" class="com.springinaction.springidol.PoieticJuggler">
+        <constructor-arg value="15"/>
+        <constructor-arg ref="sonnet29"/>
+    </bean>
+
+    <!-- 单例 -->
+    <bean id="theStage" class="com.springinaction.springidol.Stage" factory-method="getInstance"/>
+
+    <!-- 多例 -->
+    <bean id="ticket" class="com.springinaction.springidol.Ticket" scope="prototype"/>
+
+    <bean id="guitar" class="com.springinaction.springidol.Guitar"/>
+
+    <!-- 构造kenny音乐家 注入简单值Instrument和Song -->
+    <bean id="kenny" class="com.springinaction.springidol.Instrumentalist">
+        <property name="song" value="Jingle Bells"/>
+        <property name="instrument" ref="guitar"/>
+    </bean>
+
+    <!-- 简单Audience Bean -->
+    <bean id="audience" class="com.springinaction.springidol.Audience"/>
+
+    <!-- magician bean -->
+    <bean id="magician" class="com.springinaction.springidol.Magician"/>
+    <bean id="volunteer" class="com.springinaction.springidol.Volunteer"/>
+    <!-- 配置切面  -->
+    <aop:config>
+        <aop:aspect ref="audience">
+            <!--<aop:before pointcut="execution(* com.springinaction.springidol.Performer.perform(..))" method="takeSeats"/>
+            <aop:before method="turnOffCellPhones"
+                        pointcut="execution(* com.springinaction.springidol.Performer.perform(..))"/>
+            <aop:after-returning method="applaud"
+                                 pointcut="execution(* com.springinaction.springidol.Performer.perform(..))"/>
+            <aop:after-throwing method="demandRefund"
+                                pointcut="execution(* com.springinaction.springidol.Performer.perform(..))"/>-->
+            <aop:pointcut id="performance"
+                          expression="execution(* com.springinaction.springidol.Performer.perform(..))"/>
+            <aop:around method="watchPerformance" pointcut-ref="performance"/>
+
+        </aop:aspect>
+    </aop:config>
+
+    <aop:config>
+        <aop:aspect ref="magician">
+            <aop:pointcut id="thinking"
+                          expression="execution(* com.springinaction.springidol.Thinker.thinkOfSomething(String)) and args(thoughts)"/>
+            <aop:before method="interceptThoughts" pointcut-ref="thinking"/>
+        </aop:aspect>
+    </aop:config>
+</beans>
+
